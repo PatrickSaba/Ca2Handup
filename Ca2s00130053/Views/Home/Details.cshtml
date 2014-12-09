@@ -1,0 +1,29 @@
+﻿@model Ca2s00130053.Models.Movie
+
+<div class="container">
+    <h2>@ViewBag.PageTitle</h2>
+    <div class="row">
+        <div class="col-xs-2">
+            <h4><span class="label label-warning">Director: &nbsp;</span>&nbsp;@Model.Director.FirstName</h4>
+        </div>
+        <div class="col-xs-3">
+            <h4><span class="label label-warning">Genre:&nbsp;</span>&nbsp;&nbsp;<span class="pie">@ViewBag.Genre</span></h4>
+        </div>
+        <div class="col-xs-4">
+            <h4><span class="label label-warning">Premieres:&nbsp;</span>&nbsp;<span id="Premieres">@Model.ReleaseDate.ToShortDateString()</span></h4>
+        </div>
+        <div class="col-xs-3">
+            <h4 class="text-center"><span class="label label-primary text-center">Male/Female Split&nbsp;&nbsp;</span></h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-9">
+            @Html.Partial("_ActorsInMovie", Model.Actors)
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-info", @style = "margin-top:10px" })
+        </div>
+        <div class="col-xs-3">
+            <canvas id="maleFemaleSplitChart"></canvas>
+        </div>
+    </div>
+    </div>
+

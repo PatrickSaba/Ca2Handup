@@ -1,0 +1,179 @@
+﻿@model IEnumerable<Ca2s00130053.Models.Movie>
+
+<div class="container">
+   
+    <h2>Movie List</h2> 
+
+
+<p>
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+</p>
+<table class ="table table-condensed table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ReleaseDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Director)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReleaseDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Director.FullName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.MovieID }, new { @class = "btn btn-info btn-xs" }) |
+            @Html.ActionLink("Details", "Details", new { id=item.MovieID }, new { @class = "btn btn-info btn-xs" }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.MovieID }, new { @class = "btn btn-info btn-xs" })
+        </td>
+    </tr>
+}
+
+</table>
+
+ </div>
+
+@section scripts
+{
+    <script>
+        $(function () { 
+            $('#EditActor :input[name="male"]').click(function () {
+                $('#EditActor :input[name="female"]').prop('checked', false);
+            });
+            $('#EditActor :input[name="female"]').click(function () {
+                $('#EditActor :input[name="male"]').prop('checked', false);
+            });
+            @if (Model.Any())
+            {             
+                <text>
+            showActors(@Model.First().MovieID);
+                </text>
+            }
+        });
+
+        
+        $('#CreateActor').submit(function () {
+            if ($(this).find('input[name="name"]').val() != "") {
+                $.ajax({
+                    url: '@Url.Action("CreateActor")',
+                    type: "POST",
+                    data: $(this).serialize(), 
+                    success: function () {
+                        showActors($('form').find('input[name="movieID"]').val());                        
+                        $('form').find('input[name="name"]').val(""); 
+                    }
+                });
+            }
+            return false;
+        });
+
+        
+        function showDirector(directorID) {
+            $.ajax({
+                url: '@Url.Action("DirectorByID")',
+                data: { id: directorID },
+                success: function (data) {
+                    $('#Detail').hide();
+                    $('#CreateActor').hide();
+                    $('#Detail').html(data);
+                    $('#Detail').fadeIn(1000);
+                },
+                error: function () {
+                    $('#Detail').html("<h3>Couldn't find a director</h3>");
+                }
+            }
+            );
+        }
+
+        
+        function showActors(movieID) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("ActorsByID")',
+                data: { id: movieID },
+                success: function (data) {
+                    $('#Detail').hide();
+                    $('#CreateActor').hide();
+                    $('#Detail').html(data);
+                    $('#Detail').fadeIn("slow");
+                    $('#CreateActor').find('input[name="movieID"]').val(movieID);
+                    $('#CreateActor').find('input[name="name"]').val("");
+                    $('#CreateActor').fadeIn("slow");
+                },
+                error: function (data) {
+                    $('#Detail').html('<h3>Error in retrieval</h3>');
+                }
+            });
+        }
+
+        function showEditActor(movieID, movieID, actorName, sex) {
+            $('#EditActor').slideDown("fast");
+            $('#EditActor').show();
+            $('#CreateActor').hide();
+            $('#EditActor :input[name="actorID"]').val(actorID);
+            $('#EditActor :input[name="movieID"]').val(movieID);
+            $('#EditActor :input[name="name"]').val(actorName);
+            if (sex == 'Male') {
+                $('#EditActor :input[name="male"]').prop('checked', true);
+                $('#EditActor :input[name="female"]').prop('checked', false);
+            } else {
+                $('#EditActor :input[name="female"]').prop('checked', true);
+                $('#EditActor :input[name="male"]').prop('checked', false);
+            }
+        }
+
+        $('#EditActor').submit(function () {
+            if ($('#EditActor :input[name="male"]').prop('checked') == true) {
+                $('#EditActor :input[name="sex"]').val('male');
+            } else {
+                $('#EditActor :input[name="sex"]').val('female');
+            }
+            $.ajax({
+                url: '@Url.Action("UpdateActor")',
+                type: "POST",
+                data: $(this).serialize(),
+                success: function () {
+                    $('#EditActor').hide();
+                    showActors($('#EditActor :input[name="movieID"]').val()); 
+                    toastr.info($('#EditActor :input[name="name"]').val() + ' Updated');
+                },
+                error: function (data) {
+                    $('#Detail').html('<h3>Could not update Actor record</h3>');
+                }
+            });
+            return false;
+        });
+
+        function deleteActor(actorID, movieID) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeleteActor")',
+                data: { id: actorID, movieID: movieID },
+                success: function (data) {
+                    $('#Detail').hide();
+                    $('#CreateActor').hide();
+                    $('#Detail').html(data);
+                    $('#Detail').fadeIn("slow");
+                    $('#CreateActor').find('input[name="movieID"]').val(movieID); 
+                    $('#CreateActor').find('input[name="name"]').val("");
+                    $('#CreateActor').fadeIn("slow");
+                },
+                error: function (data) {
+                    $('#Detail').html('<h3>Error in retrieval</h3>');
+                }
+            });
+        }
+    </script>
+}

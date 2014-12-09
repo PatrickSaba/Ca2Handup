@@ -1,0 +1,35 @@
+﻿﻿@model IEnumerable<Ca2s00130053.Models.Actor>
+
+@if (Model.Any())
+{
+    <table id="ActorTable" class="table table-condensed table-striped" 
+        style="table-layout:fixed; margin-bottom: 0px">
+        <tr>
+            <th colspan="3">
+                @ViewBag.movieName
+            </th>
+        </tr>
+
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <a onclick="showEditActor('@item.MovieID','@item.ActorID','@item.Name','@item.Sex')" class="btn btn-xs btn-info">Edit</a>
+                        <span class="badge">@item.Sex.ToString().Substring(0, 1)</span>
+                       
+                    </td>
+                    <td>                        
+                        <a onclick="DeleteActor('@item.ActorID','@item.MovieID')" class="btn btn-xs btn-danger">Delete</a>
+                    </td>
+                </tr>
+        }
+        } 
+    </table>
+}
+else
+{<div><strong><mark>No Actors confirmed for @ViewBag.movieName</mark></strong></div>}
